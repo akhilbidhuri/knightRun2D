@@ -1,0 +1,92 @@
+[gd_scene load_steps=11 format=3 uid="uid://bomuo5ahnvbsb"]
+
+[ext_resource type="Texture2D" uid="uid://c6077ih4hthsj" path="res://assets/sprites/slime_green.png" id="1_3788e"]
+[ext_resource type="PackedScene" uid="uid://vlr7si7jcgi1" path="res://scenes/kill_zone.tscn" id="2_v3w73"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="3_uevdl"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vp1qq"]
+atlas = ExtResource("1_3788e")
+region = Rect2(0, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fafex"]
+atlas = ExtResource("1_3788e")
+region = Rect2(24, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5kfn7"]
+atlas = ExtResource("1_3788e")
+region = Rect2(48, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3l1h1"]
+atlas = ExtResource("1_3788e")
+region = Rect2(72, 24, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3w06s"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vp1qq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fafex")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5kfn7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3l1h1")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xnklo"]
+size = Vector2(10, 12)
+
+[sub_resource type="GDScript" id="GDScript_v8n2u"]
+script/source = "extends Node2D
+
+const SPEED = 20
+
+var direction = 1
+
+@onready var ray_cast_left = $\"../../RayCastLeft\"
+@onready var ray_cast_right = $\"../../RayCastRight\"
+@onready var ray_cast_right_down = $\"../../RayCastRightDown\"
+@onready var ray_cast_left_down = $\"../../RayCastLeftDown\"
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if ray_cast_left.is_colliding() || ray_cast_right.is_colliding() || !ray_cast_left_down.is_colliding() || !ray_cast_right_down.is_colliding():
+		direction *= -1
+	position.x += direction * SPEED * delta
+	
+"
+
+[node name="enemy" type="Node2D"]
+script = ExtResource("3_uevdl")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3w06s")
+autoplay = "default"
+frame_progress = 0.0489934
+
+[node name="killZone" parent="." instance=ExtResource("2_v3w73")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="killZone"]
+position = Vector2(0, 5)
+shape = SubResource("RectangleShape2D_xnklo")
+script = SubResource("GDScript_v8n2u")
+
+[node name="RayCastRight" type="RayCast2D" parent="."]
+target_position = Vector2(14, 0)
+
+[node name="RayCastLeft" type="RayCast2D" parent="."]
+target_position = Vector2(-14, 0)
+
+[node name="RayCastRightDown" type="RayCast2D" parent="."]
+target_position = Vector2(9, 14)
+
+[node name="RayCastLeftDown" type="RayCast2D" parent="."]
+target_position = Vector2(-9, 14)
